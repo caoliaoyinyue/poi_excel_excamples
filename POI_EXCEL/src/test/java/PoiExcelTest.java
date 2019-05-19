@@ -14,6 +14,7 @@ import org.apache.poi.openxml4j.exceptions.OpenXML4JException;
 import org.apache.poi.openxml4j.opc.OPCPackage;
 import org.apache.poi.openxml4j.opc.PackagePart;
 import org.apache.poi.ss.usermodel.*;
+import org.apache.poi.ss.util.AreaReference;
 import org.apache.poi.ss.util.CellRangeAddress;
 //import org.apache.poi.ss.usermodel.CellStyle;
 //import org.apache.poi.ss.usermodel.CellType;
@@ -31,6 +32,9 @@ import org.apache.poi.xssf.usermodel.DefaultIndexedColorMap;
 import org.apache.poi.xssf.usermodel.XSSFCell;
 import org.apache.poi.xssf.usermodel.XSSFCellStyle;
 import org.apache.poi.xssf.usermodel.XSSFColor;
+import org.apache.poi.xssf.usermodel.XSSFFont;
+import org.apache.poi.xssf.usermodel.XSSFPivotTable;
+import org.apache.poi.xssf.usermodel.XSSFRichTextString;
 import org.apache.poi.xssf.usermodel.XSSFRow;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
@@ -514,6 +518,48 @@ public class PoiExcelTest {
         }
     }
 
+    public void pivotTable() {
+//        XSSFWorkbook wb = new XSSFWorkbook();
+//        XSSFSheet sheet = wb.createSheet();
+
+        //Create some data to build the pivot table on
+//        setCellData(sheet);
+//        XSSFPivotTable pivotTable = sheet.createPivotTable(new AreaReference("A1:D4"), new CellReference("H5"));
+        //Configure the pivot table
+        //Use first column as row label
+//        pivotTable.addRowLabel(0);
+//        //Sum up the second column
+//        pivotTable.addColumnLabel(DataConsolidateFunction.SUM, 1);
+//        //Set the third column as filter
+//        pivotTable.addColumnLabel(DataConsolidateFunction.AVERAGE, 2);
+//        //Add filter on forth column
+//        pivotTable.addReportFilter(3);
+    }
+
+    public void multiplyStyle() {
+        // XSSF Example
+        Row row = sheet.createRow(3);
+        XSSFCell cell = (XSSFCell) row.createCell(1);
+        XSSFRichTextString rt = new XSSFRichTextString("The quick brown fox");
+
+        XSSFFont font1 = (XSSFFont) wb.createFont();
+        font1.setBold(true);
+        font1.setColor(new XSSFColor(new java.awt.Color(255, 0, 0)));
+        rt.applyFont(0, 10, font1);
+
+        XSSFFont font2 = (XSSFFont) wb.createFont();
+        font2.setItalic(true);
+        font2.setUnderline(XSSFFont.U_DOUBLE);
+        font2.setColor(new XSSFColor(new java.awt.Color(0, 255, 0)));
+        rt.applyFont(10, 19, font2);
+
+        XSSFFont font3 = (XSSFFont) wb.createFont();
+        font3.setColor(new XSSFColor(new java.awt.Color(0, 0, 255)));
+        rt.append(" Jumped over the lazy dog", font3);
+
+        cell.setCellValue(rt);
+    }
+
     @Test
     public void testWorkBook() throws FileNotFoundException, IOException {
 //        testCell();
@@ -533,7 +579,8 @@ public class PoiExcelTest {
 //        autofilter();
 //        conditionalFormat();
 //        outline();
-        settingCellProperties();
+//        settingCellProperties();
+        multiplyStyle();
         try (OutputStream fileOut = new FileOutputStream(file_name)) {
             wb.write(fileOut);
         }
