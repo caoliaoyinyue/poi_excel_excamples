@@ -7,6 +7,10 @@ import java.util.Calendar;
 import java.util.Date;
 import org.apache.poi.common.usermodel.HyperlinkType;
 import org.apache.poi.hssf.usermodel.HSSFHeader;
+import org.apache.poi.hssf.usermodel.HSSFWorkbook;
+import org.apache.poi.openxml4j.exceptions.OpenXML4JException;
+import org.apache.poi.openxml4j.opc.OPCPackage;
+import org.apache.poi.openxml4j.opc.PackagePart;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.ss.util.CellRangeAddress;
 //import org.apache.poi.ss.usermodel.CellStyle;
@@ -423,7 +427,12 @@ public class PoiExcelTest {
         link2.setAddress("'Target Sheet'!A1");
         cell.setHyperlink(link2);
         cell.setCellStyle(hlink_style);
+    }
 
+    public void autofilter() {
+//        Workbook wb = new HSSFWorkbook(); //or new XSSFWorkbook();
+//        sheet = wb.createSheet();
+        sheet.setAutoFilter(CellRangeAddress.valueOf("C5:F200"));
     }
 
     @Test
@@ -441,7 +450,8 @@ public class PoiExcelTest {
 //        headerAndFooter();
 //        commentCell();
 //        testColumnWidth();
-        createHiperlink();
+//        createHiperlink();
+        autofilter();
         try (OutputStream fileOut = new FileOutputStream(file_name)) {
             wb.write(fileOut);
         }
