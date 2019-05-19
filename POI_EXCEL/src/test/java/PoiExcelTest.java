@@ -5,6 +5,8 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 import org.apache.poi.common.usermodel.HyperlinkType;
 import org.apache.poi.hssf.usermodel.HSSFHeader;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
@@ -22,6 +24,7 @@ import org.apache.poi.ss.util.CellRangeAddress;
 //import org.apache.poi.ss.usermodel.Sheet;
 //import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.ss.util.CellReference;
+import org.apache.poi.ss.util.CellUtil;
 import org.apache.poi.xssf.streaming.SXSSFSheet;
 import org.apache.poi.xssf.streaming.SXSSFWorkbook;
 import org.apache.poi.xssf.usermodel.DefaultIndexedColorMap;
@@ -435,6 +438,82 @@ public class PoiExcelTest {
         sheet.setAutoFilter(CellRangeAddress.valueOf("C5:F200"));
     }
 
+    public void conditionalFormat() {
+
+//        Workbook workbook = new HSSFWorkbook(); // or new XSSFWorkbook();
+//        Sheet sheet = workbook.createSheet();
+        SheetConditionalFormatting sheetCF = sheet.getSheetConditionalFormatting();
+
+        ConditionalFormattingRule rule1 = sheetCF.createConditionalFormattingRule(ComparisonOperator.EQUAL, "0");
+        FontFormatting fontFmt = rule1.createFontFormatting();
+        fontFmt.setFontStyle(true, false);
+        fontFmt.setFontColorIndex(IndexedColors.DARK_RED.index);
+
+        BorderFormatting bordFmt = rule1.createBorderFormatting();
+        bordFmt.setBorderBottom(BorderStyle.THIN);
+        bordFmt.setBorderTop(BorderStyle.THICK);
+        bordFmt.setBorderLeft(BorderStyle.DASHED);
+        bordFmt.setBorderRight(BorderStyle.DOTTED);
+
+        PatternFormatting patternFmt = rule1.createPatternFormatting();
+        patternFmt.setFillBackgroundColor(IndexedColors.YELLOW.index);
+
+        ConditionalFormattingRule rule2 = sheetCF.createConditionalFormattingRule(ComparisonOperator.BETWEEN, "-10", "10");
+        ConditionalFormattingRule[] cfRules
+                = {
+                    rule1, rule2
+                };
+
+        CellRangeAddress[] regions = {
+            CellRangeAddress.valueOf("A3:A5")
+        };
+
+        sheetCF.addConditionalFormatting(regions, cfRules);
+    }
+
+    public void outline() {
+//        Workbook wb = new HSSFWorkbook();
+//        Sheet sheet1 = wb.createSheet("new sheet");
+        sheet.groupRow(5, 14);
+        sheet.groupRow(7, 14);
+        sheet.groupRow(16, 19);
+        sheet.groupColumn(4, 7);
+        sheet.groupColumn(9, 12);
+        sheet.groupColumn(10, 11);
+    }
+
+    public void settingCellProperties() {
+//        Workbook workbook = new XSSFWorkbook();  // OR new HSSFWorkbook()
+//        Sheet sheet = workbook.createSheet("Sheet1");
+        Map<String, Object> properties = new HashMap<>();
+
+        // border around a cell
+        properties.put(CellUtil.BORDER_TOP, BorderStyle.MEDIUM);
+        properties.put(CellUtil.BORDER_BOTTOM, BorderStyle.MEDIUM);
+        properties.put(CellUtil.BORDER_LEFT, BorderStyle.MEDIUM);
+        properties.put(CellUtil.BORDER_RIGHT, BorderStyle.MEDIUM);
+
+        // Give it a color (RED)
+        properties.put(CellUtil.TOP_BORDER_COLOR, IndexedColors.RED.getIndex());
+        properties.put(CellUtil.BOTTOM_BORDER_COLOR, IndexedColors.RED.getIndex());
+        properties.put(CellUtil.LEFT_BORDER_COLOR, IndexedColors.RED.getIndex());
+        properties.put(CellUtil.RIGHT_BORDER_COLOR, IndexedColors.RED.getIndex());
+
+        // Apply the borders to the cell at B2
+        Row row = sheet.createRow(1);
+        Cell cell = row.createCell(1);
+        CellUtil.setCellStyleProperties(cell, properties);
+
+        // Apply the borders to a 3x3 region starting at D4
+        for (int ix = 3; ix <= 5; ix++) {
+            row = sheet.createRow(ix);
+            for (int iy = 3; iy <= 5; iy++) {
+                cell = row.createCell(iy);
+                CellUtil.setCellStyleProperties(cell, properties);
+            }
+        }
+    }
+
     @Test
     public void testWorkBook() throws FileNotFoundException, IOException {
 //        testCell();
@@ -451,7 +530,10 @@ public class PoiExcelTest {
 //        commentCell();
 //        testColumnWidth();
 //        createHiperlink();
-        autofilter();
+//        autofilter();
+//        conditionalFormat();
+//        outline();
+        settingCellProperties();
         try (OutputStream fileOut = new FileOutputStream(file_name)) {
             wb.write(fileOut);
         }
